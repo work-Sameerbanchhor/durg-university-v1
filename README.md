@@ -11,6 +11,10 @@ A robust pipeline to scrape exam revaluation/retotaling result notifications fro
    - Employs **Key Rotation** across multiple API keys to increase rate limit throughput.
    - Enforces **structured schemas** via Pydantic to get clean JSON outputs mapping courses to roll numbers.
    - Includes automatic retry handling for large PDFs that fail due to JSON parsing/truncation.
+5. **Unified Batch results Scraper (`batch_config_scraper.py`)**:
+   - Multi-threaded proxy rotation scraper using 30 concurrent workers.
+   - Generates correct student roll numbers based on year and course mappings.
+   - Features **Resumable Progress** via `scraping_progress.json` and optimized early stopping limits.
 
 ---
 
@@ -39,12 +43,18 @@ This produces `notices.json` and a filtered list `filtered_notices.json` matchin
 ```bash
 python3 extract_all_parallel.py
 ```
-This reads the downloaded PDFs, uploads them to the Gemini Files API, performs structured extraction, and saves the aggregated database in:
-* `all_extracted_results.json`
+This reads the downloaded PDFs, uploads them to the Gemini Files API, performs structured extraction, and saves the aggregated database in `all_extracted_results.json`.
+
+### 3. Run Batch results Scraper:
+```bash
+python3 batch_config_scraper.py
+```
+This fetches the HTML results for all students across the 1,162 courses in `batch_config.json` and saves them in the `Htmls/Results` folder.
 
 ---
 
-## Datasets Produced
+## Datasets & Documents
+* **[roll_number_structure.md](roll_number_structure.md)**: Structured roll number guide for all 49 unique regular/private courses.
 * **[notices.json](notices.json)**: Metadata of 3,180 university notices.
 * **[filtered_notices.json](filtered_notices.json)**: 282 revaluation/retotaling notices.
 * **[all_extracted_results.json](all_extracted_results.json)**: Extracted course names and roll numbers from 279 processed notice PDFs.
