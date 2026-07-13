@@ -220,13 +220,20 @@ def get_high_speed_session(url):
     s = requests.Session()
     adapter = HTTPAdapter(pool_connections=MAX_WORKERS, pool_maxsize=MAX_WORKERS)
     s.mount("https://", adapter)
+    s.mount("http://", adapter)
     s.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br'
     })
     try:
         r = s.get(url, timeout=15)
         soup = BeautifulSoup(r.text, 'html.parser')
-        token = soup.find('input', {'name': '_token'})['value']
+        token_elem = soup.find('input', {'name': '_token'})
+        if not token_elem:
+            return None, None, None
+        token = token_elem['value']
         payload = {
             'COURSECD':   soup.find('input', {'name': 'COURSECD'})['value'] if soup.find('input', {'name': 'COURSECD'}) else '',
             'SEMCODE':    soup.find('input', {'name': 'SEMCODE'})['value'] if soup.find('input', {'name': 'SEMCODE'}) else '',
@@ -252,12 +259,12 @@ def fetch_result(session, roll, url, payload, token):
     data['EXAMROLLNUMBER'] = roll
     data['_token'] = token
     try:
-        r = session.post(AJAX_URL, data=data, headers=headers, timeout=6)
+        r = session.post(AJAX_URL, data=data, headers=headers, timeout=8)
         if r.status_code == 200:
             rj = r.json()
-            if 'html' in rj and len(rj['html']) > 200:
+            if 'html' in rj and len(rj.get('html', '')) > 200:
                 return roll, rj['html']
-    except:
+    except Exception:
         pass
     return roll, None
 
