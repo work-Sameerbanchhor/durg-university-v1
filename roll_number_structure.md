@@ -2,37 +2,7 @@
 
 This document defines the standardized roll number patterns for all **REGULAR / PRIVATE** courses listed in `batch_config.json`.
 
-## 1. Global Pattern Schemes
-
-Durg University assigns roll numbers based on two major schemes, determined by the examination year of the result:
-
-### Scheme A: Year 2024 & 2025 (8-Digit Simplified Format)
-A streamlined format applied to **all** undergraduate and postgraduate courses:
-```
-Format:  [Year_Code][College_Code][Serial_Number]
-Length:  8 digits
-```
-- **Year Code (1 digit)**: `4` for Year 2024 results, `5` for Year 2025 results.
-- **College Code (3 digits)**: E.g., `335` for Kalyan PG College, `337` for Govt. Digvijay College.
-- **Serial Number (4 digits)**: Sequential serial starting from `0001` to `9999` (e.g., `0129`).
-- *Example*: `43350129` (BCA Part 1, Kalyan College, Year 2024)
-
-### Scheme B: Year 2023 & Prior (11/12-Digit Indicator Format)
-A structured format containing a unique course indicator code:
-```
-Format 1 (11-digit): [Year_Code][College_Code][Course_Indicator][Serial_Number]
-Format 2 (12-digit): [23][College_Code][Course_Indicator][Serial_Number]
-Length:              11 or 12 digits
-```
-- **Year Code (1 or 2 digits)**: `3` (for 11-digit 2023), `23` (for 12-digit 2023), `9` (for 2019/2020).
-- **College Code (3 digits)**: Same 3-digit code.
-- **Course Indicator (3 digits)**: Unique code for each course/subject (listed in Section 2).
-- **Serial Number (4 digits)**: Sequential serial from `0001` to `9999`.
-- *Example*: `33340130018` (BCA Part 1, Year 2023, Course Indicator: `013`, Serial: `0018`)
-
----
-
-## 2. Verified Undergraduate (UG) Roll Number Reference Tables
+## 1. Verified Undergraduate (UG) Roll Number Reference Tables
 
 The following roll number batches (B1 to B8) have been configured against live `durg.ucanapply.com` result APIs:
 
@@ -86,7 +56,7 @@ The following roll number batches (B1 to B8) have been configured against live `
 
 ---
 
-## 3. General Usage & Verification Instructions
+## 2. General Usage & Verification Instructions
 1. **Verification Pipeline**: Run `python verify_results.py verification/<course>.txt` to test any dataset against the live API.
 2. **College Code Probe**: Rotate through standard college codes (`302`, `304`, `305`, `307`, `331`, `333`, `334`, `337`, `339`, `344`, etc.) when extracting new batches.
 3. **Year Prefixes**:
