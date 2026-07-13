@@ -24,11 +24,23 @@ BASE_FOLDER            = "Htmls/UG_Results"
 # ==========================================
 #        YEAR LEVEL CONFIGURATION
 # ==========================================
-# Maps folder names to all variations of academic year levels in ucanapply descriptions
+# Cohort offset maps graduation year (Final Year) to the corresponding exam year for each level:
+# First_Year  : graduation_year - 2 (e.g. 2023 Batch -> 2021 1st Year Exam)
+# Second_Year : graduation_year - 1 (e.g. 2023 Batch -> 2022 2nd Year Exam)
+# Final_Year  : graduation_year + 0 (e.g. 2023 Batch -> 2023 3rd Year Exam)
 YEAR_LEVELS = {
-    "First_Year":  ["first year", "1st year", "part - i", "part-i", "part i"],
-    "Second_Year": ["second year", "2nd year", "part - ii", "part-ii", "part ii"],
-    "Final_Year":  ["final year", "3rd year", "third year", "part - iii", "part-iii", "part iii"]
+    "First_Year":  {
+        "offset": -2,
+        "keywords": ["first year", "1st year", "part - i", "part-i", "part i"]
+    },
+    "Second_Year": {
+        "offset": -1,
+        "keywords": ["second year", "2nd year", "part - ii", "part-ii", "part ii"]
+    },
+    "Final_Year":  {
+        "offset": 0,
+        "keywords": ["final year", "3rd year", "third year", "part - iii", "part-iii", "part iii"]
+    }
 }
 
 # ==========================================
@@ -312,16 +324,18 @@ def main():
         return
 
     print("=" * 80)
-    print("  🎓 UNIFIED UG SCRAPER — BCA | BCom | BSc | BA (ALL YEARS)")
+    print("  🎓 UNIFIED UG SCRAPER — BCA | BCom | BSc | BA (ALL YEARS & COHORTS)")
     print("=" * 80)
 
     # Loop through all courses
     for course_name, course_cfg in COURSES.items():
         
-        # Nested loop: Check First_Year, Second_Year, and Final_Year for each course
-        for level_name, level_keywords in YEAR_LEVELS.items():
-            
-            # Directory structure: UG_Results / BSc / First_Year / B1_2019 / roll.html
+        # Nested loop: Check First_Year, Second_Year, and Final_Year with cohort offsets
+        for level_name, level_info in YEAR_LEVELS.items():
+            level_keywords = level_info["keywords"]
+            year_offset    = level_info["offset"]
+
+            # Directory structure: UG_Results / BSc / First_Year / B5_2023 / roll.html
             out_folder = os.path.join(BASE_FOLDER, course_cfg["folder"], level_name)
             os.makedirs(out_folder, exist_ok=True)
 
@@ -334,14 +348,16 @@ def main():
                     print(f"  ⚠️  [{course_name} - {level_name}] {batch_cfg['id']} — no data (skipped)")
                     continue
 
-                # Pass course_cfg to dynamically match links and exclude sub-courses
-                link_item = find_exact_link(links_data, course_cfg, batch_cfg["year"], level_keywords)
+                # Cohort target exam year = Graduation Year (batch year) + Level Offset (-2, -1, or 0)
+                target_exam_year = batch_cfg["year"] + year_offset
+
+                link_item = find_exact_link(links_data, course_cfg, target_exam_year, level_keywords)
                 
                 if not link_item:
-                    print(f"  ❌ [{course_name} - {level_name}] {batch_cfg['id']} — no link found for year {batch_cfg['year']}")
+                    print(f"  ❌ [{course_name} - {level_name}] {batch_cfg['id']} — no link found for exam year {target_exam_year}")
                     continue
 
-                log_prefix = f"{course_name} - {level_name}"
+                log_prefix = f"{course_name} - {level_name} (Exam Year {target_exam_year})"
                 process_batch(log_prefix, batch_cfg, COLLEGE_CODES, link_item, out_folder)
                 time.sleep(2)
 
