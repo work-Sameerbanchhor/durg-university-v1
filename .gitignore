@@ -1,0 +1,10 @@
+# Environment variables
+.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large binary PDF downloads
+downloaded_pdfs/
